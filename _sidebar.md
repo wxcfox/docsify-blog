@@ -4,7 +4,7 @@
 * [备战面试](./docs/a-1备战面试.md)
 
 * Java
-  * [Java基础](./docs/x-0敬请期待.md)
+  * [Java基础](./docs/java_basic.md)
   * [Java集合](./docs/x-0敬请期待.md)
   * [Java多线程](./docs/x-0敬请期待.md)
   * [jvm](./docs/x-0敬请期待.md)
