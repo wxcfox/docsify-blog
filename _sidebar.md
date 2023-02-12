@@ -1,7 +1,7 @@
 
 * [必看](./docs/a-0必看.md)
 
-* [备战面试](./docs/专题串讲.md)
+* [专题串讲](./docs/专题串讲.md)
 
 * Java
   * [Java基础](./docs/java_basic.md)
