@@ -1,7 +1,7 @@
 ## Redis基础
 
-- Redis是基于键值对的NoSql数据库，支持string、hash、list、set、zset、geo、pubscribe、stream等各种数据结构。
-- redis将数据放到内存中，读写性能块，有持久化机制。
+- Redis是基于键值对的NoSql数据库，支持String、Hash、List、Set、Zset、Bitmap、HyperLogLog、GEO等数据结构。
+- Redis将数据放到内存中，读写性能块，有持久化机制。
 - 场景丰富：缓存、数据库、限时任务、排行榜、分布式锁、分页查询等。
 
 ### Redis VS Memcached
@@ -15,7 +15,7 @@
 不同点：
 
 - Redis数据类型更丰富。Memcached只支持简单的kv数据类型。
-- Redis支持数据的持久化。可以将内存中的数据保存在磁盘中，重启后可以再次加载使用，有灾难恢复机制。内存用完之后也可以将不用的数据保存在磁盘中。Memcached把数据全部存在内容中，会在服务器内存用完之后会报错。
+- Redis支持数据的持久化。可以将内存中的数据保存在磁盘中，重启后可以再次加载使用。有灾难恢复机制。内存用完之后也可以将不用的数据保存在磁盘中。Memcached把数据全部存在内容中，会在服务器内存用完之后会报错。
 - Redis原生支持cluster集群，Memcached没有原生的集群模式，需要依靠客户端来实现往集群中分片写入数据。
 - Memcached 是多线程，非阻塞 IO 复用的网络模型；Redis 使用单线程的多路 IO 复用模型。 （Redis 6.0 针对网络数据的读写引入了多线程）
 - Redis 支持发布订阅模型、Lua 脚本、事务等功能，而 Memcached 不支持。并且，Redis 还支持更多的编程语言。
@@ -46,15 +46,16 @@
 
 ## Redis数据结构
 
-- string：string可以存储字符串、数字和二进制数据，string最大可以存储大小2M的数据。
-- hash：编码分为ziplist、hashtable两种，ziplist底层实现为压缩列表，hashtable底层实现为字典。
-- list：编码分别为ziplist（压缩列表）、linkedlist（双端链表）和quicklist。
-- set：编码分为inset和hashset。
-- zset：编码分为ziplist和skiplist。
+- String：string可以存储字符串、数字和二进制数据，string最大可以存储大小2M的数据。
+- Hash：编码分为ziplist（压缩列表）、hashtable（字典）两种。
+- List：编码分别为ziplist（压缩列表）、linkedlist（双端链表）和quicklist。
+- Set：编码分为inset和hashset。
+- Zset：编码分为ziplist和skiplist。
+- 3种特殊的： Bitmap、HyperLogLog、GEO。
 
-### zset结构底层实现
+### Zset结构底层实现
 
-zset 类型的底层数据结构是由ziplist压缩列表或skiplist跳表实现的：
+Zset类型的底层数据结构是由ziplist压缩列表或skiplist跳表实现的：
 
 - 如果有序集合的元素个数小于128个，并且每个元素的值小于64字节时，Redis会使用***ziplist***压缩列表作为zset类型的底层数据结构。
 - 如果有序集合的元素不满足上面的条件，Redis会使用***skiplist***跳表作为zset类型的底层数据结构。
@@ -75,7 +76,7 @@ Redis 默认采用的持久化方式，Redis 可以通过创建快照来获得�
 ### Redis单线程模型
 
 - Redis采用的是单线程+IO多路复用技术。
-- 单线程指的是redis中读写操作和网络IO使用的是由一个线程来完成，但其他操作还是由其他线程完成的，比如持久化操作。
+- 单线程指的是Redis中读写操作和网络IO使用的是由一个线程来完成，但其他操作还是由其他线程完成的，比如持久化操作。
 - 单线程既可以简化数据结构和算法的实现，同时也可以消除线程切换和锁竞争带来的消耗。
 - Redis中采用的IO多路复用技术实现了单线程下同时处理多个IO请求。
 
