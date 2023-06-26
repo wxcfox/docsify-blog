@@ -52,6 +52,8 @@
 
 ## Redis数据结构
 
+## 介绍
+
 - String：编码为SDS（Simple Dynamic String）。String是一种二进制安全的数据结构，可以用来存储任何类型的数据比如字符串、整数、浮点数、图片（图片的base64编码或者解码或者图片的路径）、序列化后的对象。
   - 应用：常规数据存储、计数、分布式锁
 - Hash：编码为Hash Table、ZipList。
