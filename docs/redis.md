@@ -52,19 +52,31 @@
 
 ## Redis数据结构
 
-- String：string可以存储字符串、数字和二进制数据，string最大可以存储大小2M的数据。
-- Hash：编码分为ziplist（压缩列表）、hashtable（字典）两种。
-- List：编码分别为ziplist（压缩列表）、linkedlist（双端链表）和quicklist。
-- Set：编码分为inset和hashset。
-- Zset：编码分为ziplist和skiplist。
-- 3种特殊的： Bitmap、HyperLogLog、GEO。
+- String：编码为SDS（Simple Dynamic String）。String是一种二进制安全的数据结构，可以用来存储任何类型的数据比如字符串、整数、浮点数、图片（图片的base64编码或者解码或者图片的路径）、序列化后的对象。
+  - 应用：常规数据存储、计数、分布式锁
+- Hash：编码为Hash Table、ZipList。
+  - 应用：对象数据存储
+- List：编码为LinkedList/ZipList/QuickList。
+  - 应用：信息流展示、消息队列
+- Set：编码为ZipList、Intset。
+  - 应用：数据不重复、求交并补
+- Zset：编码为ZipList、SkipList。
+  - 应用：排序
+- 其他：Bitmap、HyperLogLog、GEO、Stream。
 
-### Zset结构底层实现
+### Zset 和 set 比较
 
-Zset类型的底层数据结构是由ziplist压缩列表或skiplist跳表实现的：
+- ***相同点***：Redis有序集合和集合，都是string类型元素的集合，且不允许重复的成员。
 
-- 如果有序集合的元素个数小于128个，并且每个元素的值小于64字节时，Redis会使用***ziplist***压缩列表作为zset类型的底层数据结构。
-- 如果有序集合的元素不满足上面的条件，Redis会使用***skiplist***跳表作为zset类型的底层数据结构。
+- ***不同点***：
+  - ***score***：zset每个元素都会关联一个double类型的分数，可通过分数为成员排序。成员唯一,但score却可以重复。
+  - ***编码***： 
+    - set编码：inset或hashset。添加、删除、查找的复杂度都是O(1)。 
+    - zset编码分为ziplist或skiplist：当元素数量小于128个且每个元素长度小于64字节时使用ziplist,其他时候使用skiplist。 
+    - 当ziplist作为zset的底层存储结构时候，每个集合元素使用两个紧挨在一起的压缩列表节点来保存，第一个节点保存元素的成员，第二个元素保存元素的分值。当skiplist作为zset的底层存储结构的时候，使用skiplist按序保存元素及分值，使用dict来保存元素和分值的映射关系。
+
+- ***zset编码为啥是两种数据结构组合？***
+实际上单独使用Hashmap或skiplist也可以实现有序集合，Redis使用两种数据结构组合的原因是：如果我们单独使用Hashmap，虽然能以O(1)的时间复杂度***查找成员分值***，但是因为Hashmap是以无序的方式来保存集合元素，所以每次进行***范围操作***的时候都要进行排序；而如果单独使用skiplist，虽然能执行范围操作，但查找操作的复杂度却由O(1)变为了O(logN)。因此Redis使用了两种数据结构来共同实现有序集合。
 
 ## Redis持久化机制
 
