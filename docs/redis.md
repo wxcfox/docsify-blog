@@ -56,28 +56,20 @@
 
 ### 介绍
 
-- String：编码为SDS简单动态字符串（Simple Dynamic String）。String是一种二进制安全的数据结构，可以用来存储任何类型的数据比如字符串、整数、浮点数、图片（图片的base64编码或者解码或者图片的路径）、序列化后的对象。
-  - 应用：常规数据存储、计数、分布式锁
-- Hash：编码为Hash Table、ZipList。
-  - 应用：对象数据存储
-- List：编码为LinkedList/ZipList/QuickList。
-  - 应用：信息流展示、消息队列
-- Set：编码为ZipList、Intset。
-  - 应用：数据不重复、求交并补
-- Zset：编码为ZipList、SkipList。
-  - 应用：排序
+- String：编码为SDS简单动态字符串（Simple Dynamic String）。String是一种二进制安全的数据结构，可以用来存储任何类型的数据比如字符串、整数、浮点数、图片（图片的base64编码或者解码或者图片的路径）、序列化后的对象。应用：常规数据存储、计数、分布式锁
+- Hash：编码为Hash Table、ZipList。应用：对象数据存储
+- List：编码为LinkedList/ZipList/QuickList。应用：信息流展示、消息队列
+- Set：编码为Intset、Hashtable。应用：数据不重复、求交并补。
+  - 编码转换：集合对象保存的所有元素都是整数值且不超过512个时适用Intset，其他时候使用Hashtable。
+  - Intset内部维护了一个数组，而且存储的时候是有序的，因为在查找数据的时候是通过二分法查找来实现的。增删时间复杂度O(N)，查时间复杂度O(logN)。
+  - Hashtable就是普通的哈希表（key为set的值，value为null）。增删查时间复杂度O(1)。
+- Zset：编码为ZipList、SkipList+dict。应用：排序
+  - 编码转换：当元素数量小于128个且每个元素长度小于64字节时使用ziplist，其他时候使用skiplist。
+  - ziplist结构是一种紧凑的、连续存储的数据结构，用于节省内存空间，适用于存储小规模的有序集合。每个集合元素使用两个紧挨在一起的压缩列表节点来保存，第一个节点保存元素的成员，第二个节点保存元素的分值。增删查时间复杂度O(N)。
+  - skiplist作为zset的底层存储结构的时候，使用skiplist按序保存元素及分值，使用dict来保存元素和分值的映射关系。增删查时间复杂度O(logN)。
 - 其他：Bitmap、HyperLogLog、GEO、Stream。
 
-### Zset
-
-#### Zset底层数据结构
-
-- zset底层的存储结构包括ziplist或skiplist+dict的组合形式。
-- 当元素数量小于128个且每个元素长度小于64字节时使用ziplist，其他时候使用skiplist。
-- ziplist结构是一种紧凑的、连续存储的数据结构，用于节省内存空间，适用于存储小规模的有序集合。每个集合元素使用两个紧挨在一起的压缩列表节点来保存，第一个节点保存元素的成员，第二个节点保存元素的分值。时间复杂度O(N)。
-- skiplist作为zset的底层存储结构的时候，使用skiplist按序保存元素及分值，使用dict来保存元素和分值的映射关系。时间复杂度O(logN)。
-
-#### Zset VS Set
+### Zset VS Set
 
 - 相同点：都是string类型元素的集合，集合不允许重复的成员。
 
@@ -87,20 +79,20 @@
     - Set编码：Hashtable或Intset。增删查的复杂度都是O(1)。
     - Zset编码分为ziplist或skiplist。ziplist时增删查的复杂度是O(N)，skiplist时增删查的复杂度是O(logN)。
 
-#### Zset编码：为啥有dict和skiplist的组合形式
+### Zset编码：为啥有dict和skiplist的组合形式
 
 - 通过使用dict和skiplist的组合，Redis在zset的操作中能够同时兼顾快速的查找操作和范围操作。
 - dict，键为成员，值为分值，用于支持O(1)复杂度的按成员取分值操作。
 - skiplist，按分值排序成员，用于支持平均复杂度为O(logN)的按分值定位成员操作以及范围操作
 
-#### Zset编码：为啥用skiplist而不用二叉树、红黑树等其他数据结构
+### Zset编码：为啥用skiplist而不用二叉树、红黑树等其他数据结构
 
 - 范围查找：跳表效率比红黑树高。在平衡树上，找到指定范围的小值之后，还需要以中序遍历的顺序继续寻找其他不超过大值的节点。如果不对平衡树进行一定的改造，中序遍历并不容易实现。而在skiplist上进行范围查找就非常简单，只需要在找到小值之后，对第1层链表进行若干步的遍历就可以实现。
 - 单个查找：查找单个key，skiplist和平衡数的时间复杂度都为O(logN)。但hash表在保持较低的hash值冲突的前提下，查找时间复杂度接近O(1)，性能更高。
 - 插入删除：平衡树的插入和删除操作可能引发子树的调整，逻辑复杂，而skiplist的插入删除只需要修改相邻节点的指针，操作简单快速。
 - 算法实现：跳表实现比红黑树简单。
 
-#### Zset存储过程
+### Zset存储过程
 
 以zadd的操作为例分析Zset的添加过程，过程如下：
 
