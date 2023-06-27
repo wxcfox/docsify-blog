@@ -75,9 +75,9 @@
 
 - 不同点：
   - ***是否有序***：Zset有序集合是有序的而Set集合是无序的。Zset为每个元素关联了一个得分score，可以通过score为成员排序，成员不可以重复但score可以重复。
-  - ***编码不同***：
-    - Set编码：Hashtable或Intset。增删查的复杂度都是O(1)。
-    - Zset编码分为ziplist或skiplist。ziplist时增删查的复杂度是O(N)，skiplist时增删查的复杂度是O(logN)。
+  - ***编码不同***：[详见](### 介绍)
+    - Set编码：Intset或Hashtable。
+    - Zset编码分为ziplist或skiplist+dict。
 
 ### Zset编码：为啥有dict和skiplist的组合形式
 
