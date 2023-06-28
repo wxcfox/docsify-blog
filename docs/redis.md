@@ -56,18 +56,34 @@
 
 ### 介绍
 
-- String：编码为SDS简单动态字符串（Simple Dynamic String）。String是一种二进制安全的数据结构，可以用来存储任何类型的数据比如字符串、整数、浮点数、图片（图片的base64编码或者解码或者图片的路径）、序列化后的对象。应用：常规数据存储、计数、分布式锁
-- Hash：编码为Hash Table、ZipList。应用：对象数据存储
-- List：编码为LinkedList/ZipList/QuickList。应用：信息流展示、消息队列
-- Set：编码为Intset、Hashtable。应用：数据不重复、求交并补。
-  - 编码转换：集合对象保存的所有元素都是整数值且不超过512个时适用Intset，其他时候使用Hashtable。
-  - Intset内部维护了一个数组，而且存储的时候是有序的，因为在查找数据的时候是通过二分法查找来实现的。增删时间复杂度O(N)，查时间复杂度O(logN)。
-  - Hashtable就是普通的哈希表（key为set的值，value为null）。增删查时间复杂度O(1)。
-- Zset：编码为ZipList、SkipList+dict。应用：排序
-  - 编码转换：当元素数量小于128个且每个元素长度小于64字节时使用ziplist，其他时候使用skiplist。
-  - ziplist结构是一种紧凑的、连续存储的数据结构，用于节省内存空间，适用于存储小规模的有序集合。每个集合元素使用两个紧挨在一起的压缩列表节点来保存，第一个节点保存元素的成员，第二个节点保存元素的分值。增删查时间复杂度O(N)。
-  - skiplist作为zset的底层存储结构的时候，使用skiplist按序保存元素及分值，使用dict来保存元素和分值的映射关系。增删查时间复杂度O(logN)。
+- String：String是一种二进制安全的数据结构，可以用来存储任何类型的数据比如字符串、整数、浮点数、图片（图片的base64编码或者解码或者图片的路径）、序列化后的对象。
+  - 编码：SDS简单动态字符串（Simple Dynamic String），相比于C的原生字符串，Redis自己构建的SDS不光可以保存文本数据还可以保存二进制数据，并且获取字符串长度复杂度为O(1)（C字符串为O(N)），除此之外，Redis的SDS API是安全的，不会造成缓冲区溢出。
+  - 应用：常规数据存储、计数、分布式锁
+- Hash：Hash是一种键值对的集合，类似于关联数组。
+  - 编码：ZipList、Hashtable。hash对象保存的键和值字符串长度都小于64字节且键值对数量小于512个时使用ziplist，其他时候使用Hashtable.
+  - 应用：对象数据存储
+- List：List是一个有序的字符串集合，允许重复元素。
+  - 编码：ZipList、LinkedList、QuickList。元素数量小且长度小时使用ziplist，否则使用linkedlist，3.2版本之后一般用quicklist代替前两个。
+  - 应用：信息流展示、消息队列
+- Set：Set是一种无序的字符串集合，不允许重复元素。
+  - 编码：Intset、Hashtable。集合对象保存的所有元素都是整数值且不超过512个时适用Intset，其他时候使用Hashtable。
+    - Intset内部维护了一个数组，存储的时候是有序的，在查找数据的时候是通过二分法查找来实现的。增删时间复杂度O(N)，查时间复杂度O(logN)。
+    - Hashtable就是普通的哈希表（key为set的值，value为null）。增删查时间复杂度O(1)。
+  - 应用：数据不重复、求交并补
+- Zset：Zset是一个有序的字符串集合，不允许重复元素，每个元素都关联一个分数。
+  - 编码：ZipList、SkipList+dict。当元素数量小于128个且每个元素长度小于64字节时使用ziplist，其他时候使用skiplist。
+    - ziplist结构是一种紧凑的、连续存储的数据结构，用于节省内存空间，适用于存储小规模的有序集合。每个集合元素使用两个紧挨在一起的压缩列表节点来保存，第一个节点保存元素的成员，第二个节点保存元素的分值。增删查时间复杂度O(N)。
+    - skiplist作为zset的底层存储结构的时候，使用skiplist按序保存元素及分值，使用dict来保存元素和分值的映射关系。增删查时间复杂度O(logN)。
+  - 应用：排序
 - 其他：Bitmap、HyperLogLog、GEO、Stream。
+
+| 数据结构   | 编码                         |
+| -------- | ---------------------------- |
+| String   | SDS                          |
+| List     | ZipList、LinkedList、QuickList|
+| Hash     | ZipList、Hashtable            |
+| Set      | Intset、Hashtable             |
+| Zset     | ZipList、SkipList+dict        |
 
 ### Zset VS Set
 
