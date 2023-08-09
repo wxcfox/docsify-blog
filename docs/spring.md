@@ -24,7 +24,17 @@ SpringBoot 帮我们简单、快速地创建一个独立的、生产级别的 Sp
 
 ## Spring启动流程
 
+springboot启动流程简单概括就是先创建一个springApplication，再调用程序的run方法。
+
+run方法流程简单概括就是程序启动前的监听器和环境准备，然后是程序启动，即围绕着ioc容器的创建、加载、刷新，最后程序调用运行。run方法核心就是程序启动时的ioc刷新过程refresh。
+
+refresh流程简单概括就是先环境准备，beanFactory，再由beanFactory负责Bean的生命周期管理。
+beanFactory的步骤主要分为获取、准备、预留处理、后置处理等步骤，值得注意的是这里有个BeanFactoryPostProcessor的工厂后置处理器，用于在IOC容器加载Bean定义之后、Bean实例化之前，对IOC容器中的Bean定义进行修改或其他扩展处理。经过一些消息和监听事件后，就是refresh流程中完成所有组件的初始化流程，即Bean的生命周期。
+
+Bean的生命周期简单概括为四个步骤，分别为Bean的实例化、属性赋值、初始化、销毁。值得注意的是这里有个BeanPostProcessor是在Bean的初始化过程中被调用来对Bean进行定制化处理的。
+
 <img src="../pictures/springboot启动流程.png"/>
+
 <img src="../pictures/springboot refresh流程.png"/>
 
 ## SpringBoot自动配置
@@ -83,3 +93,23 @@ AOP不能增强的类：
 Spring AOP只能对IoC容器中的Bean进行增强，对于不受容器管理的对象不能增强。
 
 由于CGLib采用动态创建子类的方式生成代理对象，所以不能对final修饰的类进行代理。
+
+## Spring的事务管理
+
+### 事务特性
+- A 原子性（Atomicity）：事务是最小的执行单位，不允许分割。事务的原子性确保动作要么全部完成，要么完全不起作用；
+- C 一致性（Consistency）：执行事务前后，数据保持一致，例如转账业务中，无论事务是否成功，转账者和收款人的总额应该是不变的；
+- I 隔离性（Isolation）：并发访问数据库时，一个用户的事务不被其他事务所干扰，各并发事务之间数据库是独立的；
+- D 持久性（Durability）：一个事务被提交之后。它对数据库中数据的改变是持久的，即使数据库发生故障也不应该对其有任何影响。
+
+只有保证了事务的持久性、原子性、隔离性之后，一致性才能得到保障。也就是说 A、I、D 是手段，C 是目的！
+
+### Spring 支持两种方式的事务管理
+
+- 编程式事务管理
+
+编程式事务管理是通过编写代码来控制事务的开始、提交和回滚。例如使用TransactionTemplate
+
+- 声明式事务管理
+  
+声明式事务管理是通过配置的方式来管理事务，而不需要在代码中显式地控制事务。例如使用 @Transactional注解
