@@ -1,4 +1,60 @@
-## 1. 对MVC的理解
+## SpringBoot是什么
+
+SpringBoot 帮我们简单、快速地创建一个独立的、生产级别的 Spring 应用， 大多数 SpringBoot 应用只需要编写少量配置即可快速整合Spring平台以及第三方技术。
+
+特性：
+- 快速创建独立 Spring 应用
+   - SSM：导包、写配置、启动运行
+- 直接嵌入Tomcat、Jetty or Undertow（无需部署 war 包）【Servlet容器】
+   - linux  java tomcat mysql： war 放到 tomcat 的 webapps下
+  - jar： java环境；  java -jar
+- 重点：提供可选的starter，简化应用整合
+   - 场景启动器（starter）：web、json、邮件、oss（对象存储）、异步、定时任务、缓存...
+  - 导包一堆，控制好版本。
+  - 为每一种场景准备了一个依赖； web-starter。mybatis-starter
+- 重点：按需自动配置 Spring 以及 第三方库
+   - 如果这些场景我要使用（生效）。这个场景的所有配置都会自动配置好。
+  - 约定大于配置：每个场景都有很多默认配置。
+  - 自定义：配置文件中修改几项就可以
+- 提供生产级特性：如 监控指标、健康检查、外部化配置等
+   - 监控指标、健康检查（k8s）、外部化配置
+- 无代码生成、无xml
+
+总结：简化开发，简化配置，简化整合，简化部署，简化监控，简化运维。
+
+## Spring启动流程
+
+<img src="../pictures/springboot启动流程.png"/>
+<img src="../pictures/springboot refresh流程.png"/>
+
+## SpringBoot自动配置
+
+### SpringBoot自动配置的核心流程
+
+- SpringBoot应用程序启动
+- 通过SpringFactories机制加载配置文件：即通过ClassLoader去获取classpath中的配置文件META-INF/spring.factories
+- 筛选出所有自动配置类：在所有的配置文件META-INF/spring.factories中，筛选出以 EnableAutoConfiguration 为key的配置值
+- 将这些类注入到Spring IoC容器中
+
+### SpringBoot自动配置的原理剖析
+
+@SpringBootApplication
+
+- @SpringBootConfiguration -> @Configuration
+- @ComponentScan
+- @EnableAutoConfiguration -> @Import @Import(AutoConfigurationImportSelector.class)
+
+#### 如何实现类 AutoConfigurationImportSelector
+
+selectImports方法中的getAutoConfigurationEntry方法步骤：
+
+- 获取annotationMetadata的注解@EnableAutoConfiguration的属性
+- 从资源文件spring.factories中获取EnableAutoConfiguration对应的所有类
+- 通过在注解@EnableAutoConfiguration设置exclude的相关属性，可以排除指定的自动配置类
+- 根据注解@Conditional来判断是否需要排除某些自动配置类
+- 触发AutoConfiguration导入的相关事件
+
+## 对MVC的理解
 
 MVC是一种模式，但却在GoF总结出来的这个23个设计模式之外，确切的说它不是一种设计模式，它是多种设计模式的组合，并不仅仅只是一个单独的一个模式。组成MVC的三个模式分别是组合模式、策咯模式、观察者模式，MVC在软件开发中发挥的威力，最终离不开这三个模式的默契配合。
 
@@ -14,7 +70,7 @@ Spring mvc是一个基于java的实现了mvc设计模式的轻量级web框架，
 
 参考： https://zhuanlan.zhihu.com/p/35680070
 
-### 2. 对AOP的理解
+## 对AOP的理解
 
 AOP(Aspect-Oriented Prograamming：面向切面编程)是一种编程思想。能够将那些与业务无关，却为业务模块所共同调用的逻辑或责任（例如事务处理、日志管理、权限控制等）封装起来，便于减少系统的重复代码，降低模块间的耦合度，并有利于未来的可扩展性和可维护性。
 spring中实现AOP方式：默认策略是如果目标类是接口，则使用JDK动态代理技术，否则使用Cglib来生成代理。
