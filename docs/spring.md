@@ -54,11 +54,11 @@ beanFactory的步骤主要分为获取、准备、预留处理、后置处理等
 
 Bean的生命周期简单概括为四个步骤，分别为Bean的实例化、属性赋值、初始化、销毁。值得注意的是这里有个BeanPostProcessor是在Bean的初始化过程中被调用来对Bean进行定制化处理的。
 
-<img src="../pictures/图1-1%20springboot启动流程.png"/>
+<img src="../pictures/图1-1 springboot启动流程.png"/>
 
-<img src="../pictures/图1-2%20springboot%20refresh流程.png"/>
+<img src="../pictures/图1-2 springboot refresh流程.png"/>
 
-<img src="../pictures/图1-3%20springboot%20refresh%20bean生命周期流程.png"/>
+<img src="../pictures/图1-3 springboot refresh bean生命周期流程.png"/>
 
 ## SpringBoot自动配置
 
@@ -133,7 +133,7 @@ IoC 容器通过 DI 依赖注入的方式，将对象之间的依赖关系解耦
 ApplicationContext就是IoC容器，其内部持有一个实例化的BeanFactory（DefaultListableBeanFactory），所有的BeanFactory相关的操作都是委托给这个实例来处理的。
 即IoC中的反转权是交给了BeanFactory，由BeanFactory负责对象的创建与管理。  
 
-
+<img src="../pictures/BeanFactory继承结构.png"/>
 
 ## 对AOP的理解
 
