@@ -48,11 +48,9 @@ HashMap：非线程安全
 
 Hashtable：线程安全
 
-- 继承关系：
+- 性能：
 
-HashMap：属于 Java 集合框架的一部分。
-
-Hashtable：是一个遗留类（legacy class），在 Java 集合框架之前就存在。它实现了 Map 接口，但并没有继承自 Map 接口，而是直接继承自 Dictionary 类。
+由于 Hashtable 是线程安全的，它的性能可能会比 HashMap 差，因为同步操作会引入一定的开销。
 
 - 空键和空值：
 
@@ -60,15 +58,17 @@ HashMap：允许键和值都为 null。也就是说，可以插入一个键值�
 
 Hashtable：不允许键或值为 null。如果尝试插入 null 值，会抛出 NullPointerException。
 
+- 继承关系：
+
+HashMap：属于 Java 集合框架的一部分。
+
+Hashtable：是一个遗留类（legacy class），在 Java 集合框架之前就存在。它实现了 Map 接口，但并没有继承自 Map 接口，而是直接继承自 Dictionary 类。
+
 - 迭代器：
 
 HashMap：提供了快速失败（fail-fast）的迭代器。在迭代过程中，如果其他线程修改了 HashMap 的结构（增加、删除元素），将会抛出 ConcurrentModificationException 异常。
 
 Hashtable：提供了一个 enumerator（枚举器），它并不是一个迭代器，也不支持快速失败。它只能用于遍历集合，而不能进行修改。
-
-- 性能：
-
-由于 Hashtable 是线程安全的，它的性能可能会比 HashMap 差，因为同步操作会引入一定的开销。
 
 ### HashMap线程不安全，如何解决？
 
