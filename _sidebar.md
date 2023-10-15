@@ -1,6 +1,7 @@
 * Java
     * [Java基础](./docs/java_basic.md)
     * [Java集合]()
+    * [Map](./docs/java_collection_map.md)
     * [Java多线程🌟🌟](./docs/java_thread.md)
     * [JVM🌟🌟🌟](./docs/jvm.md)
 
