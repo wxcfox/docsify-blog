@@ -82,10 +82,12 @@ Bean的生命周期简单概括为四个步骤，分别为Bean的实例化、属
 @Autowired 和 @Resource 是 Java 中用于实现依赖注入两个注解，它们的作用是为了简化和提高代码的可维护性。区别如下：
 
 - 注解来源
+  
   `@Autowired`是Spring提供的注解。
   `@Resource`是JDK提供的注解。
   
 - 注入方式
+  
   `@Autowired`只能按类型注入，默认情况下要求依赖对象必须存在。
   如果要允许null值可以设置require属性为false。
   如果想按照名称注入，可以结合Qualifier注解一起使用。
