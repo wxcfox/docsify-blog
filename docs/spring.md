@@ -102,12 +102,14 @@ BeanFactory：负责生产和管理Bean的一个工厂接口，提供一个Sprin
 FactoryBean：Spring提供的另外一种Bean的创建方式，是通过工厂模式用来生产Bean的。
 
 - BeanFactory具体：
+
 BeanFactory只是个接⼝，并不是IOC容器的具体实现，但是Spring容器给出了很多种实现，如 DefaultListableBeanFactory、XmlBeanFactory、ApplicationContext等。
 
 BeanFactory内含方法：
 containsBean(String beanName)、getBean(String)、getType(String name)、getBean(String, Class)、isSingleton(String) 、getAliases(String name)
 
 - FactoryBean为什么存在：
+
 Spring通过反射机制利⽤ <bean><bean> 的class属性指定实现类实例化Bean，在某些情况下，实例化Bean过程⽐较复杂，如果按照传统的⽅式，则需要在 <bean> <bean> 中提供⼤量的配置信息。配置⽅式的灵活性是受限的，这时采⽤编码的⽅式可能会得到⼀个简单的⽅案。
 
 - FactoryBean具体：
