@@ -77,6 +77,45 @@ Bean的生命周期简单概括为四个步骤，分别为Bean的实例化、属
 - @ComponentScan
 - @EnableAutoConfiguration -> @Import @Import(AutoConfigurationImportSelector.class)
 
+### @Autowired vs @resource
+
+@Autowired 和 @Resource 是 Java 中用于实现依赖注入两个注解，它们的作用是为了简化和提高代码的可维护性。区别如下：
+
+- 注解来源
+  `@Autowired`是Spring提供的注解。
+  `@Resource`是JDK提供的注解。
+  
+- 注入方式
+  `@Autowired`只能按类型注入，默认情况下要求依赖对象必须存在。
+  如果要允许null值可以设置require属性为false。
+  如果想按照名称注入，可以结合Qualifier注解一起使用。
+  
+  `@Resource`默认按名称注入，也可以按类型注入。它有俩属性name和type。
+  如果没有指定name属性，当注解标注在字段上，默认取字段的名称作为bean名称寻找依赖对象，当注解标注在属性的setter方法上，默认取属性名称作为bean名称寻找依赖对象。
+  同时指定name和type，找唯一匹配的bean对象，找不到抛异常。只指定name，则查找名称匹配的bean对象，找不到抛异常。只指定type，找类型匹配的唯一bean，找不到或找到多个，则抛异常。没有指定name和type，默认按name，没有匹配再按type匹配。
+
+### @BeanFactory vs @FactoryBean
+
+BeanFactory：负责生产和管理Bean的一个工厂接口，提供一个Spring Ioc容器规范。
+FactoryBean：Spring提供的另外一种Bean的创建方式，是通过工厂模式用来生产Bean的。
+
+- BeanFactory具体：
+BeanFactory只是个接⼝，并不是IOC容器的具体实现，但是Spring容器给出了很多种实现，如 DefaultListableBeanFactory、XmlBeanFactory、ApplicationContext等。
+
+BeanFactory内含方法：
+containsBean(String beanName)、getBean(String)、getType(String name)、getBean(String, Class)、isSingleton(String) 、getAliases(String name)
+
+- FactoryBean为什么存在：
+Spring通过反射机制利⽤ <bean><bean> 的class属性指定实现类实例化Bean，在某些情况下，实例化Bean过程⽐较复杂，如果按照传统的⽅式，则需要在 <bean> <bean> 中提供⼤量的配置信息。配置⽅式的灵活性是受限的，这时采⽤编码的⽅式可能会得到⼀个简单的⽅案。
+
+- FactoryBean具体：
+但对FactoryBean⽽⾔，这个Bean不是简单的Bean，⽽是⼀个能⽣产或者修饰对象⽣成的⼯⼚Bean,它的实现与设计模式中的⼯⼚模式和修饰器模式类似。
+
+FactoryBean内含方法：
+T getObject()：返回由FactoryBean创建的Bean实例，如果isSingleton()返回true，则该实例会放到Spring容器中单实例缓存池中；
+boolean isSingleton()：返回由FactoryBean创建的Bean实例的作⽤域是singleton还是 prototype；
+Class getObjectType() 返回FactoryBean创建的Bean类型。当配置⽂件中 <bean> 的class属性配置的实现类是FactoryBean时，通过getBean()⽅法返回的不是FactoryBean本身，⽽是FactoryBean#getObject()⽅法所返回的对象，相当于FactoryBean#getObject()代理了getBean()⽅法。
+
 #### 如何实现类 AutoConfigurationImportSelector
 
 selectImports方法中的getAutoConfigurationEntry方法步骤：
