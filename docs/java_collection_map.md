@@ -72,9 +72,20 @@ Hashtable：提供了一个 enumerator（枚举器），它并不是一个迭代
 
 ### HashMap线程不安全，如何解决？
 
-HashMap 不是线程安全的。
-HashMap 的底层是利用数组+链表+红黑树的组合，在多线程的情况下，多个线程同时触发 HashMap 的时候可能会发生冲突。所以在多线程的时候不建议使用 HashMap。
-如果想使用线程安全的 HashMap，可以使用 Hashtable、Collections类 将 HashMap 包装成线程安全的 HashMap、ConcurrentHashMap。推荐使用 ConcurrentHashMap。
+结论：HashMap 不是线程安全的。
+
+原因：HashMap 的底层是利用数组+链表+红黑树的组合，在多线程的情况下，多个线程同时触发 HashMap 的时候可能会发生冲突。所以在多线程的时候不建议使用 HashMap。
+
+解决方法：使用线程安全的 HashMap的三种方式：
+
+- Hashtable
+  Hashtable 是一个传统的、线程安全的哈希表实现，它是在公共方法上使用 synchronized 关键字来确保线程安全，同步方案性能不高。
+  
+- Collections类将 HashMap 包装成线程安全的 HashMap
+  Collections类中提供了synchronizedMap()方法，可以将传入的Map包装成线程同步的Map。除此以外，Collections还提供了如下三类方法来返回一个不可变的集合，这三类方法的参数是原有的集合对象，返回值是该集合的“只读”版本。通过Collections提供的三类方法，可以生成“只读”Map。emptyMap()：返回一个空的不可变的Map对象。singletonMap()：返回一个只包含指定键值对的不可变的Map对象。unmodifiableMap()：返回指定Map对象的不可变视图。
+
+- ConcurrentHashMap（最推荐）
+  ConcurrentHashMap是线程安全且高效的HashMap，在JDK8中ConcurrentHashMap的底层数据结构为“数组+链表+红黑树”，为了降低锁的粒度，JDK8是直接在Map的槽内存储链表或红黑树。并发插入时它锁定的是头节点，相比于段头节点的个数是可以随着扩容而增加的，所以粒度更小。引入红黑树，则是为了在冲突剧烈时，提高查找槽内元素的效率。
 
 ## ConcurrentHashMap
 
