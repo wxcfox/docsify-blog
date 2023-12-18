@@ -124,7 +124,7 @@ Spring通过反射机制利⽤ <bean><bean> 的class属性指定实现类实例�
 
 如图1，首先我们定义一个工厂接口如A去实现FactoryBean，再将这个FactoryBean实例A配置起来即为一个Bean。在需要获取对象时，我们先通过Spring容器获取这个FactoryBean实例A，再通过FactoryBean实例A实现的getObject()方法来生产实际的Bean。在这个过程中，FactoryBean这个Bean就充当了工厂的角色，将创建对象的细节都封装在工厂中，使得客户端代码无需关心具体的实现细节。所以说FactoryBean是个特殊的Bean，且它生产Bean的方式就是用的工厂模式。
 
-<img src="../pictures/工厂方法模式BeanFactory.png" alt=""/>
+<img src="../pictures/FactoryBean的工厂方法模式体现.png" alt=""/>
 
 - FactoryBean具体：
 但对FactoryBean⽽⾔，这个Bean不是简单的Bean，⽽是⼀个能⽣产或者修饰对象⽣成的⼯⼚Bean,它的实现与设计模式中的⼯⼚模式和修饰器模式类似。
@@ -146,6 +146,10 @@ selectImports方法中的getAutoConfigurationEntry方法步骤：
 
 ## 对MVC的理解
 
+MVC是一种设计模式，MVC要实现的目标是将软件的用户界面和业务逻辑分离以使代码可扩展性、可复用性、可维护性、灵活性加强。软件按照MVC模式可分为三层，即Model（模型）、View（视图）、Controller（控制器）。将软件分层的好处是可以将对象之间的耦合度降低，便于代码的维护。
+
+Model封装了数据和对数据的操作，是实际进行数据处理的地方，View负责进行模型的展示，一般就是我们见到的用户界面，Controller控制器负责视图和模型之间的交互主要负责两方面的动作，一是把用户的请求分发到相应的模型，二是把模型的改变及时地响应到视图上。
+
 MVC是一种模式，但却在GoF总结出来的这个23个设计模式之外，确切的说它不是一种设计模式，它是多种设计模式的组合，并不仅仅只是一个单独的一个模式。组成MVC的三个模式分别是组合模式、策咯模式、观察者模式，MVC在软件开发中发挥的威力，最终离不开这三个模式的默契配合。
 
 **View层，单独实现了组合模式**
@@ -154,11 +158,9 @@ MVC是一种模式，但却在GoF总结出来的这个23个设计模式之外，
 
 **View层和Controller层，实现了策咯模式**
 
-MVC要实现的**目标是将软件用户界面和业务逻辑分离以使代码可扩展性、可复用性、可维护性、灵活性加强**。在这种模式下软件被分为三层，model、view、Controller。将软件分层的好处是可以将对象之间的耦合度降低，便于代码的维护。model封装了数据和对数据的操作，是实际进行数据处理的地方，view负责进行模型的展示，一般就是我们见到的用户界面，Controller控制器负责视图和模型之间的交互主要负责两方面的动作，一是把用户的请求分发到相应的模型，二是把模型的改变及时地响应到视图上。
+## Spring MVC 执行流程
 
-Spring mvc是一个基于java的实现了mvc设计模式的轻量级web框架，Spring mvc框架已经成为了mvc模式的最主流实现，前端控制器是DispatcherServlet接口实现类，映射处理器是HandlerMapping接口实现类，视图解析器是ViewResolver接口实现类，页面控制器是Controller接口实现类。
-
-参考： https://zhuanlan.zhihu.com/p/35680070
+<img src="../pictures/SpringMVC执行流程.png" alt=""/>
 
 ## 对IoC的理解
 
