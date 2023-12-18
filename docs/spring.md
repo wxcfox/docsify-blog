@@ -93,8 +93,14 @@ Bean的生命周期简单概括为四个步骤，分别为Bean的实例化、属
   如果想按照名称注入，可以结合Qualifier注解一起使用。
   
   `@Resource`默认按名称注入，也可以按类型注入。它有俩属性name和type。
-  如果没有指定name属性，当注解标注在字段上，默认取字段的名称作为bean名称寻找依赖对象，当注解标注在属性的setter方法上，默认取属性名称作为bean名称寻找依赖对象。
-  同时指定name和type，找唯一匹配的bean对象，找不到抛异常。只指定name，则查找名称匹配的bean对象，找不到抛异常。只指定type，找类型匹配的唯一bean，找不到或找到多个，则抛异常。没有指定name和type，默认按name，没有匹配再按type匹配。
+
+属性 | 行为 |
+|------|------|
+| 未指定 `name` | 标注字段取字段名称；标注Setter方法取属性名称|
+| 同时指定 `name` 和 `type` | 指定名称和类型匹配的唯一bean | 
+| 只指定 `name` 属性 | 指定名称匹配的唯一bean |
+| 只指定 `type` 属性 | 指定类型匹配的唯一bean |
+| 未指定 `name` 和 `type` | 默认按照 `name` 注入，找不到则按照 `type` 注入。未指定`name`时，标注字段时取字段名称,标注Setter方法时取属性名称|
 
 ### @BeanFactory vs @FactoryBean
 
@@ -111,6 +117,14 @@ containsBean(String beanName)、getBean(String)、getType(String name)、getBean
 - FactoryBean为什么存在：
 
 Spring通过反射机制利⽤ <bean><bean> 的class属性指定实现类实例化Bean，在某些情况下，实例化Bean过程⽐较复杂，如果按照传统的⽅式，则需要在 <bean> <bean> 中提供⼤量的配置信息。配置⽅式的灵活性是受限的，这时采⽤编码的⽅式可能会得到⼀个简单的⽅案。
+
+- FactoryBean的工厂模式体现：
+
+工厂模式是一种创建型设计模式，其主要目的是将对象的创建过程抽象出来，让子类或者工厂类决定实例化哪个类。简单工厂是一个对象负责所有具体类的实例化，而工厂方法模式是定义一个用于创建对象的接口，由一群子类负责实例化，简单工厂不具备工厂方法的弹性。在Spring中，FactoryBean采用的是典型的工厂方法模式，让FactoryBean这个工厂类决定最终实例化的类。
+
+如图1，首先我们定义一个工厂接口如A去实现FactoryBean，再将这个FactoryBean实例A配置起来即为一个Bean。在需要获取对象时，我们先通过Spring容器获取这个FactoryBean实例A，再通过FactoryBean实例A实现的getObject()方法来生产实际的Bean。在这个过程中，FactoryBean这个Bean就充当了工厂的角色，将创建对象的细节都封装在工厂中，使得客户端代码无需关心具体的实现细节。所以说FactoryBean是个特殊的Bean，且它生产Bean的方式就是用的工厂模式。
+
+<img src="../pictures/工厂方法模式BeanFactory.png" alt=""/>
 
 - FactoryBean具体：
 但对FactoryBean⽽⾔，这个Bean不是简单的Bean，⽽是⼀个能⽣产或者修饰对象⽣成的⼯⼚Bean,它的实现与设计模式中的⼯⼚模式和修饰器模式类似。
