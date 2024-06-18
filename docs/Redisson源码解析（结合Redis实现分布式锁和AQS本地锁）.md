@@ -1,8 +1,8 @@
 Redisson源码解析（结合Redis实现分布式锁和AQS本地锁）
 
-### 前置知识
+## 前置知识
 
-#### Redis实现分布式锁相关知识简介
+### Redis实现分布式锁相关知识简介
 
 本地锁是解决同一个进程下的不同线程对资源的占用，
 
@@ -16,7 +16,7 @@ Redisson源码解析（结合Redis实现分布式锁和AQS本地锁）
 
 而我们今天讲的redisson就是一个封装好了的框架，用redis实现分布式锁功能，并且加入看门狗机制，解决过期时长不好设置问题。并且封装好的框架，也能额外支持分布式锁的可重入、高可用等高级特性。
 
-#### AQS相关知识简介
+### AQS相关知识简介
 
 AQS是JUC包下的一个类，全称是AbstractQueuedSynchronizer，是一个用来构建锁或者其他同步装置的框架。
 
@@ -32,7 +32,7 @@ AQS是JUC包下的一个类，全称是AbstractQueuedSynchronizer，是一个用
 
 这就是AQS中ReentrantLock可重入锁独占式锁的大体逻辑。
 
-#### Redisson框架结合Redis实现分布式锁和AQS本地锁
+### Redisson框架结合Redis实现分布式锁和AQS本地锁
 
 之所以简单提及前面两个知识点，主要是因为Redisson框架里既包含了利用Redis的lua脚本实现分布式锁，也有利用AQS本地锁中的Semaphore共享锁机制。
 
@@ -42,9 +42,9 @@ AQS是JUC包下的一个类，全称是AbstractQueuedSynchronizer，是一个用
 
 关于这个分布式锁也用到了本地锁的逻辑，这里就简单提一下，后面再详细分析。
 
-###  Redisson核心内容
+##  Redisson核心内容
 
-#### 加锁
+### 加锁
 
 RedissonLock#tryLock(long, long, java.util.concurrent.TimeUnit)
 
@@ -69,7 +69,7 @@ RedissonLock#tryLock(long, long, java.util.concurrent.TimeUnit)
 
 所以这里第2种就利用到共享锁Semaphore，能够让单台服务器里线程先在本地去争夺令牌，减少了对redis资源的频繁访问。
 
-#### 订阅
+### 订阅
 
 redisson框架作者灵活运用到了redis支持发布订阅的特性。
 
@@ -81,7 +81,7 @@ CompletableFuture<RedissonLockEntry> subscribeFuture = subscribe(threadId);
 
 commandExecutor.getNow(subscribeFuture).getLatch().tryAcquire(ttl, TimeUnit.MILLISECONDS);
 
-#### 解锁
+### 解锁
 
 RedissonLock#unlock()
 
@@ -95,7 +95,7 @@ RedissonLock#unlock()
 订阅者接收到时唤醒线程，即第2种tryAcquire中的Semaphore队列中阻塞的线程
 ![img_2.png](img_2.png)
 
-#### 看门狗
+### 看门狗
 
 - renewExpirationAsync 延时任务每10s去执行lua脚本续租30s
 - cancelExpirationRenewal 取消看门狗
