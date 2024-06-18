@@ -44,7 +44,7 @@ AQS是JUC包下的一个类，全称是AbstractQueuedSynchronizer，是一个用
 
 ###  Redisson核心内容
 
-### 加锁
+#### 加锁
 
 RedissonLock#tryLock(long, long, java.util.concurrent.TimeUnit)
 
@@ -69,7 +69,7 @@ RedissonLock#tryLock(long, long, java.util.concurrent.TimeUnit)
 
 所以这里第2种就利用到共享锁Semaphore，能够让单台服务器里线程先在本地去争夺令牌，减少了对redis资源的频繁访问。
 
-### 订阅
+#### 订阅
 
 redisson框架作者灵活运用到了redis支持发布订阅的特性。
 
@@ -81,7 +81,7 @@ CompletableFuture<RedissonLockEntry> subscribeFuture = subscribe(threadId);
 
 commandExecutor.getNow(subscribeFuture).getLatch().tryAcquire(ttl, TimeUnit.MILLISECONDS);
 
-### 解锁
+#### 解锁
 
 RedissonLock#unlock()
 
@@ -95,7 +95,7 @@ RedissonLock#unlock()
 订阅者接收到时唤醒线程，即第2种tryAcquire中的Semaphore队列中阻塞的线程
 ![img_2.png](img_2.png)
 
-### 看门狗
+#### 看门狗
 
 - renewExpirationAsync 延时任务每10s去执行lua脚本续租30s
 - cancelExpirationRenewal 取消看门狗
