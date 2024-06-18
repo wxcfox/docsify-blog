@@ -80,6 +80,7 @@ RedissonLock#unlock()
 
 真正解锁时发布消息
 ![img_1.png](img_1.png)
+
 订阅者接收到时唤醒线程，即第2种tryAcquire中的Semaphore队列中阻塞的线程
 ![img_2.png](img_2.png)
 
@@ -89,7 +90,7 @@ RedissonLock#unlock()
 - cancelExpirationRenewal 取消看门狗
 
 看门狗机制哪些情况会停止续期
-- 调用cancelExpirationRenewal 取消看门狗
+- 调用 cancelExpirationRenewal 取消看门狗
 - 调用unlock 释放分布式锁
 - 线程中断也不会续期
 - 进程退出比如宕机或被kill掉自然也不会续期
